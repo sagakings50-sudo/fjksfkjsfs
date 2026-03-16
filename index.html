@@ -242,6 +242,26 @@ async function fetchAndUpdate(manual = false) {
   overlay.classList.add('active');
   if (btn) { btn.disabled = true; btn.textContent = '↻ Updating...'; }
 
+  try {
+    // This now fetches from your OWN serverless backend
+    const res = await fetch('/api/fetch-ngos');
+    const parsed = await res.json();
+
+    if (res.ok && !parsed.error) {
+      renderData(parsed);
+    } else {
+      renderFallback();
+    }
+    updateLiveBadge();
+    nextRefreshAt = Date.now() + REFRESH_MS;
+  } catch(err) {
+    renderFallback();
+  } finally {
+    overlay.classList.remove('active');
+    if (btn) { btn.disabled = false; btn.textContent = '↻ Refresh Now'; }
+  }
+}
+
   const loadingMsgs = ['Scanning Lahore social pages...', 'Checking news outlets...', 'Filtering Lahore-only data...', 'Formatting your digest...'];
   let msgIdx = 0;
   const msgInterval = setInterval(() => {
