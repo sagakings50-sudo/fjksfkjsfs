@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>NGO Lahore Tracker</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --green: #1a6b45; --green-light: #e8f5ee; --green-mid: #2d9e6b;
+      --gold: #c9922a; --gold-light: #fdf3e1;
+      --red: #b83232; --red-light: #fdeaea;
+      --blue: #1a4b8c; --blue-light: #e8f0fb;
+      --bg: #f7f5f0; --card: #ffffff; --text: #1a1a1a;
+      --muted: #6b6b6b; --border: #e2ddd6; --shadow: 0 2px 16px rgba(0,0,0,0.07);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+
+    header { background: linear-gradient(135deg, #0d3d24 0%, #1a6b45 60%, #0f4a2e 100%); color: white; padding: 0; position: relative; overflow: hidden; }
+    header::before { content: ''; position: absolute; top: -60px; right: -60px; width: 280px; height: 280px; border-radius: 50%; background: rgba(255,255,255,0.04); }
+    .header-inner { max-width: 1100px; margin: 0 auto; padding: 36px 24px 28px; position: relative; z-index: 1; }
+    .header-top { display: flex; align-items: flex-start; justify-content: space-between; flex-wrap: wrap; gap: 16px; }
+    .header-brand { display: flex; align-items: center; gap: 14px; }
+    .header-icon { width: 52px; height: 52px; background: rgba(255,255,255,0.15); border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 26px; border: 1px solid rgba(255,255,255,0.2); }
+    .header-title h1 { font-family: 'Playfair Display', serif; font-size: 26px; font-weight: 700; line-height: 1.2; }
+    .header-title p { font-size: 13px; opacity: 0.75; margin-top: 3px; font-weight: 300; }
+    .live-badge { display: flex; align-items: center; gap: 7px; background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.2); border-radius: 20px; padding: 7px 14px; font-size: 12px; font-weight: 500; }
+    .live-dot { width: 7px; height: 7px; background: #4ade80; border-radius: 50%; animation: pulse 1.5s infinite; }
+    @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.6;transform:scale(1.3)} }
+    .header-stats { display: flex; gap: 28px; margin-top: 24px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.12); }
+    .stat-num { font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 700; color: #a7f3d0; }
+    .stat-label { font-size: 11px; opacity: 0.65; margin-top: 1px; text-transform: uppercase; letter-spacing: 0.5px; }
+
+    .nav-tabs { background: white; border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+    .nav-tabs-inner { max-width: 1100px; margin: 0 auto; padding: 0 24px; display: flex; overflow-x: auto; }
+    .tab { padding: 14px 20px; font-size: 13px; font-weight: 500; color: var(--muted); cursor: pointer; border-bottom: 2px solid transparent; white-space: nowrap; transition: all 0.2s; }
+    .tab.active { color: var(--green); border-bottom-color: var(--green); }
+    .tab:hover:not(.active) { color: var(--text); }
+
+    .main { max-width: 1100px; margin: 0 auto; padding: 28px 24px; }
+    .section { display: none; }
+    .section.active { display: block; }
+
+    .update-bar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; flex-wrap: wrap; gap: 10px; }
+    .last-updated { font-size: 12px; color: var(--muted); display: flex; align-items: center; gap: 6px; }
+    .refresh-btn { display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 500; color: var(--green); background: var(--green-light); border: none; border-radius: 8px; padding: 7px 14px; cursor: pointer; transition: all 0.2s; }
+    .refresh-btn:hover { background: #d4eddf; }
+    .refresh-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    .loading-overlay { display: none; position: fixed; inset: 0; background: rgba(13,61,36,0.85); z-index: 999; align-items: center; justify-content: center; flex-direction: column; gap: 16px; }
+    .loading-overlay.active { display: flex; }
+    .spinner { width: 44px; height: 44px; border: 3px solid rgba(255,255,255,0.2); border-top-color: #4ade80; border-radius: 50%; animation: spin 0.8s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .loading-text { color: white; font-size: 14px; font-weight: 500; }
+    .loading-sub { color: rgba(255,255,255,0.6); font-size: 12px; }
+
+    .cards-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 16px; margin-bottom: 28px; }
+    .card { background: var(--card); border-radius: 14px; border: 1px solid var(--border); box-shadow: var(--shadow); overflow: hidden; transition: transform 0.2s, box-shadow 0.2s; animation: fadeUp 0.4s ease both; }
+    .card:hover { transform: translateY(-2px); box-shadow: 0 6px 24px rgba(0,0,0,0.1); }
+    @keyframes fadeUp { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
+    .card-accent { height: 4px; background: var(--green-mid); }
+    .card-accent.gold { background: var(--gold); }
+    .card-accent.blue { background: var(--blue); }
+    .card-accent.red  { background: var(--red); }
+    .card-body { padding: 18px 20px; }
+    .card-org { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.6px; color: var(--green); margin-bottom: 6px; }
+    .card-title { font-family: 'Playfair Display', serif; font-size: 16px; font-weight: 600; line-height: 1.4; margin-bottom: 8px; }
+    .card-desc { font-size: 13px; color: var(--muted); line-height: 1.6; margin-bottom: 10px; }
+    .badge { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; font-weight: 500; padding: 3px 9px; border-radius: 20px; }
+    .badge-green { background: var(--green-light); color: var(--green); }
+    .card-date { font-size: 11px; color: var(--muted); margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border); }
+    .members { display: flex; align-items: center; flex-wrap: wrap; gap: 5px; margin-top: 8px; }
+    .member-tag { background: #f0ede8; border-radius: 6px; padding: 2px 8px; font-size: 11px; color: #444; }
+
+    .section-heading { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; }
+    .section-heading h2 { font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 600; }
+    .section-heading .count { background: var(--green-light); color: var(--green); font-size: 12px; font-weight: 600; padding: 2px 9px; border-radius: 20px; }
+
+    .timeline { position: relative; padding-left: 28px; }
+    .timeline::before { content: ''; position: absolute; left: 7px; top: 6px; bottom: 6px; width: 2px; background: var(--border); border-radius: 2px; }
+    .timeline-item { position: relative; margin-bottom: 20px; animation: fadeUp 0.4s ease both; }
+    .timeline-dot { position: absolute; left: -24px; top: 4px; width: 14px; height: 14px; border-radius: 50%; background: var(--green-mid); border: 2px solid white; box-shadow: 0 0 0 2px var(--green-mid); }
+    .timeline-content { background: white; border: 1px solid var(--border); border-radius: 12px; padding: 14px 16px; box-shadow: var(--shadow); }
+    .timeline-date { font-size: 11px; font-weight: 600; color: var(--green); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
+    .timeline-title { font-weight: 600; font-size: 14px; margin-bottom: 4px; }
+    .timeline-desc { font-size: 13px; color: var(--muted); line-height: 1.5; }
+
+    .alert-card { background: white; border-radius: 12px; border: 1px solid var(--border); border-left: 4px solid var(--red); padding: 16px 18px; margin-bottom: 14px; box-shadow: var(--shadow); animation: fadeUp 0.4s ease both; }
+    .alert-title { font-weight: 600; font-size: 14px; margin-bottom: 5px; }
+    .alert-desc { font-size: 13px; color: var(--muted); line-height: 1.6; }
+    .alert-date { font-size: 11px; color: var(--muted); margin-top: 8px; }
+
+    .ngo-table { width: 100%; border-collapse: separate; border-spacing: 0; background: white; border-radius: 14px; border: 1px solid var(--border); overflow: hidden; box-shadow: var(--shadow); }
+    .ngo-table th { background: #f7f5f0; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: var(--muted); padding: 12px 18px; text-align: left; border-bottom: 1px solid var(--border); }
+    .ngo-table td { padding: 14px 18px; font-size: 13px; border-bottom: 1px solid #f0ede8; vertical-align: middle; }
+    .ngo-table tr:last-child td { border-bottom: none; }
+    .ngo-table tr:hover td { background: #fafaf8; }
+    .ngo-name-cell { font-weight: 600; display: flex; align-items: center; gap: 10px; }
+    .ngo-avatar { width: 34px; height: 34px; border-radius: 9px; background: var(--green-light); color: var(--green); display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; }
+
+    .ramadan-banner { background: linear-gradient(135deg, #0d3d24, #1e5c38); color: white; border-radius: 14px; padding: 18px 22px; margin-bottom: 24px; display: flex; align-items: center; gap: 16px; box-shadow: 0 4px 20px rgba(26,107,69,0.3); }
+    .ramadan-icon { font-size: 32px; flex-shrink: 0; }
+    .ramadan-text h3 { font-family: 'Playfair Display', serif; font-size: 16px; margin-bottom: 3px; }
+    .ramadan-text p { font-size: 12px; opacity: 0.8; }
+
+    .countdown-bar { background: white; border: 1px solid var(--border); border-radius: 10px; padding: 10px 16px; margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between; font-size: 12px; color: var(--muted); box-shadow: var(--shadow); }
+    .countdown-bar .next { font-weight: 600; color: var(--green); font-size: 14px; }
+    .progress-wrap { flex: 1; margin: 0 16px; background: var(--border); border-radius: 4px; height: 4px; overflow: hidden; }
+    .progress-bar { height: 4px; background: var(--green-mid); border-radius: 4px; transition: width 1s linear; }
+
+    .empty-state { text-align: center; padding: 48px 24px; color: var(--muted); }
+    .empty-state .icon { font-size: 40px; margin-bottom: 12px; }
+    .empty-state h3 { font-size: 16px; margin-bottom: 6px; color: var(--text); }
+    .empty-state p { font-size: 13px; }
+
+    footer { background: #0d1f14; color: rgba(255,255,255,0.6); text-align: center; padding: 24px; font-size: 12px; margin-top: 40px; }
+    footer strong { color: rgba(255,255,255,0.9); }
+    .made-by { margin-top: 10px; font-size: 13px; letter-spacing: 2px; color: rgba(255,255,255,0.35); font-weight: 600; text-transform: uppercase; }
+    .made-by span { color: #4ade80; }
+
+    @media (max-width: 600px) {
+      .header-stats { gap: 16px; }
+      .cards-grid { grid-template-columns: 1fr; }
+      .countdown-bar { flex-direction: column; gap: 8px; align-items: flex-start; }
+      .progress-wrap { width: 100%; margin: 0; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="loading-overlay" id="loading-overlay">
+  <div class="spinner"></div>
+  <div class="loading-text">Fetching latest NGO news...</div>
+  <div class="loading-sub" id="loading-sub">Searching Lahore NGO activity</div>
+</div>
+
+<header>
+  <div class="header-inner">
+    <div class="header-top">
+      <div class="header-brand">
+        <div class="header-icon">🕌</div>
+        <div class="header-title">
+          <h1>NGO Lahore Tracker</h1>
+          <p>AI-powered real-time NGO activity monitor for Lahore, Pakistan</p>
+        </div>
+      </div>
+      <div class="live-badge">
+        <div class="live-dot"></div>
+        <span id="live-time">Live · Loading...</span>
+      </div>
+    </div>
+    <div class="header-stats">
+      <div class="stat"><div class="stat-num" id="stat-ngos">8+</div><div class="stat-label">Active NGOs</div></div>
+      <div class="stat"><div class="stat-num" id="stat-today">—</div><div class="stat-label">Today's Events</div></div>
+      <div class="stat"><div class="stat-num" id="stat-upcoming">—</div><div class="stat-label">Upcoming</div></div>
+      <div class="stat"><div class="stat-num">1hr</div><div class="stat-label">Auto Update</div></div>
+    </div>
+  </div>
+</header>
+
+<nav class="nav-tabs">
+  <div class="nav-tabs-inner">
+    <div class="tab active" onclick="showTab('today', this)">📍 Today's Events</div>
+    <div class="tab" onclick="showTab('upcoming', this)">📆 Upcoming</div>
+    <div class="tab" onclick="showTab('alerts', this)">🔔 Alerts & News</div>
+    <div class="tab" onclick="showTab('directory', this)">🏢 NGO Directory</div>
+  </div>
+</nav>
+
+<main class="main">
+  <div class="countdown-bar">
+    <span>🔄 Next auto-update in:</span>
+    <div class="progress-wrap"><div class="progress-bar" id="progress-bar" style="width:100%"></div></div>
+    <span class="next" id="countdown-display">59:59</span>
+  </div>
+
+  <div id="tab-today" class="section active">
+    <div class="update-bar">
+      <div class="last-updated" id="last-updated-text">🕐 Loading latest data...</div>
+      <button class="refresh-btn" id="refresh-btn" onclick="fetchAndUpdate(true)">↻ Refresh Now</button>
+    </div>
+    <div id="ramadan-banner-wrap"></div>
+    <div class="section-heading">
+      <h2>Today's Events</h2>
+      <span class="count" id="today-count">—</span>
+    </div>
+    <div class="cards-grid" id="today-cards">
+      <div class="empty-state"><div class="icon">🔍</div><h3>Loading events...</h3><p>Fetching the latest NGO activity in Lahore</p></div>
+    </div>
+  </div>
+
+  <div id="tab-upcoming" class="section">
+    <div class="section-heading"><h2>Upcoming Events</h2><span class="count" id="upcoming-count">—</span></div>
+    <div class="timeline" id="upcoming-timeline">
+      <div class="empty-state"><div class="icon">📆</div><h3>Loading...</h3></div>
+    </div>
+  </div>
+
+  <div id="tab-alerts" class="section">
+    <div class="section-heading"><h2>Alerts & NGO News</h2><span class="count" id="alerts-count">—</span></div>
+    <div id="alerts-list">
+      <div class="empty-state"><div class="icon">🔔</div><h3>Loading...</h3></div>
+    </div>
+  </div>
+
+  <div id="tab-directory" class="section">
+    <div class="section-heading"><h2>NGO Directory — Lahore</h2><span class="count">8 NGOs</span></div>
+    <table class="ngo-table">
+      <thead><tr><th>Organization</th><th>Focus Area</th><th>Status</th></tr></thead>
+      <tbody>
+        <tr><td><div class="ngo-name-cell"><div class="ngo-avatar">🤲</div>Alkhidmat Foundation</div></td><td><span class="badge badge-green">Humanitarian</span></td><td><span class="badge badge-green">🟢 Active</span></td></tr>
+        <tr><td><div class="ngo-name-cell"><div class="ngo-avatar">💚</div>Akhuwat Foundation</div></td><td><span class="badge badge-green">Microfinance</span></td><td><span class="badge badge-green">🟢 Active</span></td></tr>
+        <tr><td><div class="ngo-name-cell"><div class="ngo-avatar">⚖️</div>HRCP</div></td><td><span class="badge badge-green">Human Rights</span></td><td><span class="badge badge-green">🟢 Active</span></td></tr>
+        <tr><td><div class="ngo-name-cell"><div class="ngo-avatar">🍱</div>Saylani Welfare</div></td><td><span class="badge badge-green">Food Security</span></td><td><span class="badge badge-green">🟢 Active</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+</main>
+
+<footer>
+  <strong>NGO Lahore Tracker</strong> &nbsp;·&nbsp; AI-powered · Updates every hour automatically<br/>
+  <div class="made-by">Made by <span>SHAH G</span></div>
+</footer>
+
+<script>
+const REFRESH_MS = 60 * 60 * 1000;
+let refreshTimer = null;
+let countdownTimer = null;
+let nextRefreshAt = Date.now() + REFRESH_MS;
+
+function showTab(name, el) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+  if (el) el.classList.add('active');
+}
+
+function startCountdown() {
+  clearInterval(countdownTimer);
+  countdownTimer = setInterval(() => {
+    const remaining = Math.max(0, nextRefreshAt - Date.now());
+    const pct = (remaining / REFRESH_MS) * 100;
+    const m = Math.floor(remaining / 60000);
+    const s = Math.floor((remaining % 60000) / 1000);
+    document.getElementById('countdown-display').textContent = String(m).padStart(2,'0') + ':' + String(s).padStart(2,'0');
+    const pb = document.getElementById('progress-bar');
+    if (pb) pb.style.width = pct + '%';
+    if (remaining === 0) fetchAndUpdate(false);
+  }, 1000);
+}
+
+function updateLiveBadge() {
+  const str = new Date().toLocaleString('en-PK', { timeZone: 'Asia/Karachi', day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+  document.getElementById('live-time').textContent = 'Live · Updated ' + str + ' PKT';
+  document.getElementById('last-updated-text').textContent = '🕐 Last updated: ' + str + ' PKT';
+}
+
+async function fetchAndUpdate(manual = false) {
+  const overlay = document.getElementById('loading-overlay');
+  const btn = document.getElementById('refresh-btn');
+  overlay.classList.add('active');
+  if (btn) { btn.disabled = true; btn.textContent = '↻ Updating...'; }
+
+  const loadingMsgs = ['Searching Lahore NGO activity...', 'Scanning social pages...', 'Compiling your digest...'];
+  let msgIdx = 0;
+  const msgInterval = setInterval(() => {
+    document.getElementById('loading-sub').textContent = loadingMsgs[msgIdx % loadingMsgs.length];
+    msgIdx++;
+  }, 2000);
+
+  try {
+    const today = new Date().toLocaleDateString('en-PK', { timeZone: 'Asia/Karachi', day: 'numeric', month: 'long', year: 'numeric' });
+    const prompt = `You are an NGO tracker for Lahore, Pakistan. Today is ${today}. Search the web for the LATEST information about NGOs in Lahore, Pakistan and return ONLY a valid JSON object with this exact structure:
+{
+  "todayEvents": [{"org": "Org Name", "orgColor": "green", "title": "Title", "desc": "Desc", "members": ["Member"], "badge": "Active", "badgeColor": "green", "date": "Date", "location": "Location"}],
+  "upcomingEvents": [{"title": "Title", "desc": "Desc", "date": "Date", "orgs": ["Org"], "color": "green"}],
+  "alerts": [{"title": "Title", "desc": "Desc", "date": "Date", "color": "red", "members": ["Member"]}],
+  "ramadan": {"show": false, "day": "", "message": ""},
+  "stats": {"todayCount": 0, "upcomingCount": 0, "alertsCount": 0}
+}`;
+
+    const res = await fetch('/api/fetch-ngos', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ prompt: prompt })
+    });
+
+    const parsed = await res.json();
+
+    if (res.ok && !parsed.error) {
+      renderData(parsed);
+    } else {
+      console.error('API Error:', parsed.error);
+      renderFallback();
+    }
+    updateLiveBadge();
+    nextRefreshAt = Date.now() + REFRESH_MS;
+
+  } catch(err) {
+    console.error('Fetch error:', err);
+    renderFallback();
+  } finally {
+    clearInterval(msgInterval);
+    overlay.classList.remove('active');
+    if (btn) { btn.disabled = false; btn.textContent = '↻ Refresh Now'; }
+  }
+}
+
+function renderData(data) {
+  document.getElementById('stat-today').textContent = data.stats?.todayCount || data.todayEvents?.length || '—';
+  document.getElementById('stat-upcoming').textContent = data.stats?.upcomingCount || data.upcomingEvents?.length || '—';
+  document.getElementById('today-count').textContent = (data.todayEvents?.length || 0) + ' events';
+  document.getElementById('upcoming-count').textContent = (data.upcomingEvents?.length || 0) + ' events';
+  document.getElementById('alerts-count').textContent = (data.alerts?.length || 0) + ' alerts';
+
+  const bannerWrap = document.getElementById('ramadan-banner-wrap');
+  if (data.ramadan?.show) {
+    bannerWrap.innerHTML = `<div class="ramadan-banner"><div class="ramadan-icon">🌙</div><div class="ramadan-text"><h3>${data.ramadan.day ? data.ramadan.day + ' Ramadan' : 'Ramadan Mubarak'}</h3><p>${data.ramadan.message}</p></div></div>`;
+  } else { bannerWrap.innerHTML = ''; }
+
+  const todayCards = document.getElementById('today-cards');
+  if (data.todayEvents?.length) {
+    todayCards.innerHTML = data.todayEvents.map((e, i) => `
+      <div class="card" style="animation-delay:${i * 0.05}s">
+        <div class="card-accent ${e.orgColor || 'green'}"></div>
+        <div class="card-body">
+          <div class="card-org ${e.orgColor || 'green'}">${escHtml(e.org)}</div>
+          <div class="card-title">${escHtml(e.title)}</div>
+          <div class="card-desc">${escHtml(e.desc)}</div>
+          ${e.members?.length ? `<div class="members"><span style="font-size:11px;color:#888">👥</span>${e.members.map(m => `<span class="member-tag">${escHtml(m)}</span>`).join('')}</div>` : ''}
+          <div style="margin-top:8px"><span class="badge badge-${e.badgeColor || 'green'}">● ${escHtml(e.badge || 'Active')}</span></div>
+          <div class="card-date">📅 ${escHtml(e.date)} ${e.location ? '&nbsp;·&nbsp; 📍 ' + escHtml(e.location) : ''}</div>
+        </div>
+      </div>`).join('');
+  } else {
+    todayCards.innerHTML = `<div class="empty-state"><div class="icon">📭</div><h3>No events found</h3><p>No NGO events reported in Lahore today.</p></div>`;
+  }
+
+  const timeline = document.getElementById('upcoming-timeline');
+  if (data.upcomingEvents?.length) {
+    timeline.innerHTML = data.upcomingEvents.map((e, i) => `
+      <div class="timeline-item" style="animation-delay:${i * 0.05}s">
+        <div class="timeline-dot ${e.color === 'gold' ? 'gold' : ''}"></div>
+        <div class="timeline-content">
+          <div class="timeline-date ${e.color === 'gold' ? 'gold' : ''}">📅 ${escHtml(e.date)}</div>
+          <div class="timeline-title">${escHtml(e.title)}</div>
+          <div class="timeline-desc">${escHtml(e.desc)}</div>
+        </div>
+      </div>`).join('');
+  } else {
+    timeline.innerHTML = `<div class="empty-state"><div class="icon">📆</div><h3>No upcoming events</h3></div>`;
+  }
+
+  const alertsList = document.getElementById('alerts-list');
+  if (data.alerts?.length) {
+    alertsList.innerHTML = data.alerts.map((a, i) => `
+      <div class="alert-card ${a.color || ''}" style="animation-delay:${i * 0.05}s">
+        <div class="alert-title">${escHtml(a.title)}</div>
+        <div class="alert-desc">${escHtml(a.desc)}</div>
+        <div class="alert-date">📅 ${escHtml(a.date)}</div>
+      </div>`).join('');
+  } else {
+    alertsList.innerHTML = `<div class="empty-state"><div class="icon">✅</div><h3>No alerts</h3></div>`;
+  }
+}
+
+function renderFallback() {
+  document.getElementById('today-cards').innerHTML = `<div class="empty-state"><div class="icon">⚠️</div><h3>Could not load data</h3><p>Ensure you have added GEMINI_API_KEY in Vercel.</p></div>`;
+}
+
+function escHtml(str) {
+  if (!str) return '';
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  fetchAndUpdate(false);
+  startCountdown();
+  setInterval(() => { nextRefreshAt = Date.now() + REFRESH_MS; fetchAndUpdate(false); }, REFRESH_MS);
+});
+</script>
+</body>
+</html>
