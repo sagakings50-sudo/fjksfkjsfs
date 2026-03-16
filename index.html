@@ -56,22 +56,29 @@
     .loading-sub { color: rgba(255,255,255,0.6); font-size: 12px; }
 
     .cards-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 16px; margin-bottom: 28px; }
-    .card { background: var(--card); border-radius: 14px; border: 1px solid var(--border); box-shadow: var(--shadow); overflow: hidden; transition: transform 0.2s, box-shadow 0.2s; animation: fadeUp 0.4s ease both; }
+    .card { background: var(--card); border-radius: 14px; border: 1px solid var(--border); box-shadow: var(--shadow); overflow: hidden; transition: transform 0.2s, box-shadow 0.2s; animation: fadeUp 0.4s ease both; display: flex; flex-direction: column; }
     .card:hover { transform: translateY(-2px); box-shadow: 0 6px 24px rgba(0,0,0,0.1); }
     @keyframes fadeUp { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
     .card-accent { height: 4px; background: var(--green-mid); }
     .card-accent.gold { background: var(--gold); }
     .card-accent.blue { background: var(--blue); }
     .card-accent.red  { background: var(--red); }
-    .card-body { padding: 18px 20px; }
+    .card-body { padding: 18px 20px; flex: 1; display: flex; flex-direction: column; }
     .card-org { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.6px; color: var(--green); margin-bottom: 6px; }
     .card-title { font-family: 'Playfair Display', serif; font-size: 16px; font-weight: 600; line-height: 1.4; margin-bottom: 8px; }
-    .card-desc { font-size: 13px; color: var(--muted); line-height: 1.6; margin-bottom: 10px; }
+    .card-desc { font-size: 13px; color: var(--muted); line-height: 1.6; margin-bottom: 10px; flex: 1; }
     .badge { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; font-weight: 500; padding: 3px 9px; border-radius: 20px; }
     .badge-green { background: var(--green-light); color: var(--green); }
+    .badge-gold { background: var(--gold-light); color: var(--gold); }
+    .badge-blue { background: var(--blue-light); color: var(--blue); }
+    .badge-red { background: var(--red-light); color: var(--red); }
     .card-date { font-size: 11px; color: var(--muted); margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border); }
-    .members { display: flex; align-items: center; flex-wrap: wrap; gap: 5px; margin-top: 8px; }
+    .members { display: flex; align-items: center; flex-wrap: wrap; gap: 5px; margin-top: 8px; margin-bottom: 10px; }
     .member-tag { background: #f0ede8; border-radius: 6px; padding: 2px 8px; font-size: 11px; color: #444; }
+    
+    /* NEW LINK BUTTON STYLES */
+    .source-link { display: inline-flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 600; color: var(--blue); background: var(--blue-light); padding: 6px 12px; border-radius: 6px; text-decoration: none; margin-top: 12px; transition: background 0.2s, transform 0.1s; align-self: flex-start; }
+    .source-link:hover { background: #d1e0f5; transform: translateY(-1px); }
 
     .section-heading { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; }
     .section-heading h2 { font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 600; }
@@ -81,23 +88,15 @@
     .timeline::before { content: ''; position: absolute; left: 7px; top: 6px; bottom: 6px; width: 2px; background: var(--border); border-radius: 2px; }
     .timeline-item { position: relative; margin-bottom: 20px; animation: fadeUp 0.4s ease both; }
     .timeline-dot { position: absolute; left: -24px; top: 4px; width: 14px; height: 14px; border-radius: 50%; background: var(--green-mid); border: 2px solid white; box-shadow: 0 0 0 2px var(--green-mid); }
-    .timeline-content { background: white; border: 1px solid var(--border); border-radius: 12px; padding: 14px 16px; box-shadow: var(--shadow); }
+    .timeline-content { background: white; border: 1px solid var(--border); border-radius: 12px; padding: 14px 16px; box-shadow: var(--shadow); display: flex; flex-direction: column; }
     .timeline-date { font-size: 11px; font-weight: 600; color: var(--green); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
     .timeline-title { font-weight: 600; font-size: 14px; margin-bottom: 4px; }
     .timeline-desc { font-size: 13px; color: var(--muted); line-height: 1.5; }
 
-    .alert-card { background: white; border-radius: 12px; border: 1px solid var(--border); border-left: 4px solid var(--red); padding: 16px 18px; margin-bottom: 14px; box-shadow: var(--shadow); animation: fadeUp 0.4s ease both; }
+    .alert-card { background: white; border-radius: 12px; border: 1px solid var(--border); border-left: 4px solid var(--red); padding: 16px 18px; margin-bottom: 14px; box-shadow: var(--shadow); animation: fadeUp 0.4s ease both; display: flex; flex-direction: column; }
     .alert-title { font-weight: 600; font-size: 14px; margin-bottom: 5px; }
     .alert-desc { font-size: 13px; color: var(--muted); line-height: 1.6; }
     .alert-date { font-size: 11px; color: var(--muted); margin-top: 8px; }
-
-    .ngo-table { width: 100%; border-collapse: separate; border-spacing: 0; background: white; border-radius: 14px; border: 1px solid var(--border); overflow: hidden; box-shadow: var(--shadow); }
-    .ngo-table th { background: #f7f5f0; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: var(--muted); padding: 12px 18px; text-align: left; border-bottom: 1px solid var(--border); }
-    .ngo-table td { padding: 14px 18px; font-size: 13px; border-bottom: 1px solid #f0ede8; vertical-align: middle; }
-    .ngo-table tr:last-child td { border-bottom: none; }
-    .ngo-table tr:hover td { background: #fafaf8; }
-    .ngo-name-cell { font-weight: 600; display: flex; align-items: center; gap: 10px; }
-    .ngo-avatar { width: 34px; height: 34px; border-radius: 9px; background: var(--green-light); color: var(--green); display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; }
 
     .ramadan-banner { background: linear-gradient(135deg, #0d3d24, #1e5c38); color: white; border-radius: 14px; padding: 18px 22px; margin-bottom: 24px; display: flex; align-items: center; gap: 16px; box-shadow: 0 4px 20px rgba(26,107,69,0.3); }
     .ramadan-icon { font-size: 32px; flex-shrink: 0; }
@@ -131,8 +130,8 @@
 
 <div class="loading-overlay" id="loading-overlay">
   <div class="spinner"></div>
-  <div class="loading-text">Fetching latest NGO news...</div>
-  <div class="loading-sub" id="loading-sub">Searching Lahore NGO activity</div>
+  <div class="loading-text">Fetching latest Lahore NGO news...</div>
+  <div class="loading-sub" id="loading-sub">Scanning news & social pages</div>
 </div>
 
 <header>
@@ -151,9 +150,9 @@
       </div>
     </div>
     <div class="header-stats">
-      <div class="stat"><div class="stat-num" id="stat-ngos">8+</div><div class="stat-label">Active NGOs</div></div>
       <div class="stat"><div class="stat-num" id="stat-today">—</div><div class="stat-label">Today's Events</div></div>
       <div class="stat"><div class="stat-num" id="stat-upcoming">—</div><div class="stat-label">Upcoming</div></div>
+      <div class="stat"><div class="stat-num" id="stat-alerts">—</div><div class="stat-label">Alerts</div></div>
       <div class="stat"><div class="stat-num">1hr</div><div class="stat-label">Auto Update</div></div>
     </div>
   </div>
@@ -164,7 +163,6 @@
     <div class="tab active" onclick="showTab('today', this)">📍 Today's Events</div>
     <div class="tab" onclick="showTab('upcoming', this)">📆 Upcoming</div>
     <div class="tab" onclick="showTab('alerts', this)">🔔 Alerts & News</div>
-    <div class="tab" onclick="showTab('directory', this)">🏢 NGO Directory</div>
   </div>
 </nav>
 
@@ -182,7 +180,7 @@
     </div>
     <div id="ramadan-banner-wrap"></div>
     <div class="section-heading">
-      <h2>Today's Events</h2>
+      <h2>Today's Events in Lahore</h2>
       <span class="count" id="today-count">—</span>
     </div>
     <div class="cards-grid" id="today-cards">
@@ -191,30 +189,17 @@
   </div>
 
   <div id="tab-upcoming" class="section">
-    <div class="section-heading"><h2>Upcoming Events</h2><span class="count" id="upcoming-count">—</span></div>
+    <div class="section-heading"><h2>Upcoming Events (Lahore)</h2><span class="count" id="upcoming-count">—</span></div>
     <div class="timeline" id="upcoming-timeline">
       <div class="empty-state"><div class="icon">📆</div><h3>Loading...</h3></div>
     </div>
   </div>
 
   <div id="tab-alerts" class="section">
-    <div class="section-heading"><h2>Alerts & NGO News</h2><span class="count" id="alerts-count">—</span></div>
+    <div class="section-heading"><h2>Alerts & NGO News (Lahore)</h2><span class="count" id="alerts-count">—</span></div>
     <div id="alerts-list">
       <div class="empty-state"><div class="icon">🔔</div><h3>Loading...</h3></div>
     </div>
-  </div>
-
-  <div id="tab-directory" class="section">
-    <div class="section-heading"><h2>NGO Directory — Lahore</h2><span class="count">8 NGOs</span></div>
-    <table class="ngo-table">
-      <thead><tr><th>Organization</th><th>Focus Area</th><th>Status</th></tr></thead>
-      <tbody>
-        <tr><td><div class="ngo-name-cell"><div class="ngo-avatar">🤲</div>Alkhidmat Foundation</div></td><td><span class="badge badge-green">Humanitarian</span></td><td><span class="badge badge-green">🟢 Active</span></td></tr>
-        <tr><td><div class="ngo-name-cell"><div class="ngo-avatar">💚</div>Akhuwat Foundation</div></td><td><span class="badge badge-green">Microfinance</span></td><td><span class="badge badge-green">🟢 Active</span></td></tr>
-        <tr><td><div class="ngo-name-cell"><div class="ngo-avatar">⚖️</div>HRCP</div></td><td><span class="badge badge-green">Human Rights</span></td><td><span class="badge badge-green">🟢 Active</span></td></tr>
-        <tr><td><div class="ngo-name-cell"><div class="ngo-avatar">🍱</div>Saylani Welfare</div></td><td><span class="badge badge-green">Food Security</span></td><td><span class="badge badge-green">🟢 Active</span></td></tr>
-      </tbody>
-    </table>
   </div>
 </main>
 
@@ -262,7 +247,7 @@ async function fetchAndUpdate(manual = false) {
   overlay.classList.add('active');
   if (btn) { btn.disabled = true; btn.textContent = '↻ Updating...'; }
 
-  const loadingMsgs = ['Searching Lahore NGO activity...', 'Scanning social pages...', 'Compiling your digest...'];
+  const loadingMsgs = ['Scanning Lahore social pages...', 'Checking news outlets...', 'Filtering Lahore-only data...', 'Formatting your digest...'];
   let msgIdx = 0;
   const msgInterval = setInterval(() => {
     document.getElementById('loading-sub').textContent = loadingMsgs[msgIdx % loadingMsgs.length];
@@ -271,18 +256,23 @@ async function fetchAndUpdate(manual = false) {
 
   try {
     const today = new Date().toLocaleDateString('en-PK', { timeZone: 'Asia/Karachi', day: 'numeric', month: 'long', year: 'numeric' });
-   const prompt = `You are a real-time NGO intelligence tracker for Lahore, Pakistan. Today is ${today}.
+    
+    // UPDATED STRICT LAHORE PROMPT
+    const prompt = `You are a real-time NGO intelligence tracker for Lahore, Pakistan. Today is ${today}.
 
 Use web search to find the LATEST information. Search news sites, Dawn, Geo, The News, Tribune, and social media pages (Facebook, Instagram, Twitter/X) of NGOs operating in Lahore.
 
 STRICT RULES:
-- ONLY include NGOs physically operating in Lahore city. No other city. No exceptions.
+- ONLY include NGOs and INGOs physically operating in Lahore city. No other city. No exceptions.
 - Descriptions must be MAX 2 LINES. Cut anything longer.
 - Pull key member names from event announcements or social posts.
 - Prioritize data from the last 48-72 hours only.
-- For events: search phrases like "NGO Lahore event 2026", "social work Lahore today", "Lahore welfare drive March 2026"
+- For events: search "NGO Lahore event 2026", "social work Lahore today", "Lahore welfare drive March 2026"
+- For upcoming events: search "upcoming NGO event Lahore 2026", "INGO Lahore program scheduled", "Lahore welfare event announced"
 - For news/alerts: search "NGO Lahore news", "Lahore charity incident", "welfare organization Lahore"
-- For Ramadan specifically: search "Ramadan drive Lahore NGO 2026", "iftar distribution Lahore"
+- For Ramadan: search "Ramadan drive Lahore NGO 2026", "iftar distribution Lahore"
+- UPCOMING SECTION: Only include events that are officially announced and scheduled AFTER today by NGOs or INGOs based in Lahore. No past events. No nationwide events unless Lahore is the specific venue.
+- SOURCE LINKS: For every single item (event, upcoming, alert), include the actual URL of the webpage, news article, or social media post where you found that specific information. If no direct link found, leave as empty string.
 
 Return ONLY valid JSON, no extra text:
 {
@@ -295,17 +285,21 @@ Return ONLY valid JSON, no extra text:
       "members": ["Name 1", "Name 2"],
       "badge": "Active",
       "badgeColor": "green",
-      "date": "16 Mar 2026",
-      "location": "Area name, Lahore"
+      "date": "Date",
+      "location": "Area name, Lahore",
+      "sourceUrl": "https://actual-link-where-this-was-found.com",
+      "sourceLabel": "Facebook Post / Dawn News / Twitter / NGO Website"
     }
   ],
   "upcomingEvents": [
     {
       "title": "Event name",
       "desc": "What will happen. Max 2 lines only.",
-      "date": "Date",
-      "orgs": ["NGO name"],
-      "color": "gold"
+      "date": "Future date only",
+      "orgs": ["NGO or INGO name - Lahore based only"],
+      "color": "gold",
+      "sourceUrl": "https://actual-link-where-this-was-found.com",
+      "sourceLabel": "Facebook Post / Official Website / Tribune"
     }
   ],
   "alerts": [
@@ -314,12 +308,14 @@ Return ONLY valid JSON, no extra text:
       "desc": "What happened. Lahore only. Max 2 lines.",
       "date": "Date",
       "color": "red",
-      "members": ["Key person name"]
+      "members": ["Key person name"],
+      "sourceUrl": "https://actual-link-where-this-was-found.com",
+      "sourceLabel": "Geo News / Instagram / Dawn"
     }
   ],
   "ramadan": {
     "show": true,
-    "day": "22nd Ramadan",
+    "day": "Day number",
     "message": "Specific Lahore NGO Ramadan activity happening right now."
   },
   "stats": {
@@ -329,6 +325,7 @@ Return ONLY valid JSON, no extra text:
   }
 }`;
 
+    // Pointing to your serverless backend
     const res = await fetch('/api/fetch-ngos', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -359,6 +356,7 @@ Return ONLY valid JSON, no extra text:
 function renderData(data) {
   document.getElementById('stat-today').textContent = data.stats?.todayCount || data.todayEvents?.length || '—';
   document.getElementById('stat-upcoming').textContent = data.stats?.upcomingCount || data.upcomingEvents?.length || '—';
+  document.getElementById('stat-alerts').textContent = data.stats?.alertsCount || data.alerts?.length || '—';
   document.getElementById('today-count').textContent = (data.todayEvents?.length || 0) + ' events';
   document.getElementById('upcoming-count').textContent = (data.upcomingEvents?.length || 0) + ' events';
   document.getElementById('alerts-count').textContent = (data.alerts?.length || 0) + ' alerts';
@@ -368,6 +366,7 @@ function renderData(data) {
     bannerWrap.innerHTML = `<div class="ramadan-banner"><div class="ramadan-icon">🌙</div><div class="ramadan-text"><h3>${data.ramadan.day ? data.ramadan.day + ' Ramadan' : 'Ramadan Mubarak'}</h3><p>${data.ramadan.message}</p></div></div>`;
   } else { bannerWrap.innerHTML = ''; }
 
+  // Render Today's Events with LINK BUTTON
   const todayCards = document.getElementById('today-cards');
   if (data.todayEvents?.length) {
     todayCards.innerHTML = data.todayEvents.map((e, i) => `
@@ -380,12 +379,14 @@ function renderData(data) {
           ${e.members?.length ? `<div class="members"><span style="font-size:11px;color:#888">👥</span>${e.members.map(m => `<span class="member-tag">${escHtml(m)}</span>`).join('')}</div>` : ''}
           <div style="margin-top:8px"><span class="badge badge-${e.badgeColor || 'green'}">● ${escHtml(e.badge || 'Active')}</span></div>
           <div class="card-date">📅 ${escHtml(e.date)} ${e.location ? '&nbsp;·&nbsp; 📍 ' + escHtml(e.location) : ''}</div>
+          ${e.sourceUrl ? `<a href="${escHtml(e.sourceUrl)}" target="_blank" rel="noopener noreferrer" class="source-link">🔗 ${escHtml(e.sourceLabel || 'View Source')}</a>` : ''}
         </div>
       </div>`).join('');
   } else {
-    todayCards.innerHTML = `<div class="empty-state"><div class="icon">📭</div><h3>No events found</h3><p>No NGO events reported in Lahore today.</p></div>`;
+    todayCards.innerHTML = `<div class="empty-state"><div class="icon">📭</div><h3>No events found</h3><p>No new NGO events reported in Lahore today.</p></div>`;
   }
 
+  // Render Upcoming Events with LINK BUTTON
   const timeline = document.getElementById('upcoming-timeline');
   if (data.upcomingEvents?.length) {
     timeline.innerHTML = data.upcomingEvents.map((e, i) => `
@@ -395,19 +396,24 @@ function renderData(data) {
           <div class="timeline-date ${e.color === 'gold' ? 'gold' : ''}">📅 ${escHtml(e.date)}</div>
           <div class="timeline-title">${escHtml(e.title)}</div>
           <div class="timeline-desc">${escHtml(e.desc)}</div>
+          ${e.orgs?.length ? `<div class="members" style="margin-top:10px">${e.orgs.map(o => `<span class="member-tag">${escHtml(o)}</span>`).join('')}</div>` : ''}
+          ${e.sourceUrl ? `<a href="${escHtml(e.sourceUrl)}" target="_blank" rel="noopener noreferrer" class="source-link">🔗 ${escHtml(e.sourceLabel || 'View Source')}</a>` : ''}
         </div>
       </div>`).join('');
   } else {
     timeline.innerHTML = `<div class="empty-state"><div class="icon">📆</div><h3>No upcoming events</h3></div>`;
   }
 
+  // Render Alerts with LINK BUTTON
   const alertsList = document.getElementById('alerts-list');
   if (data.alerts?.length) {
     alertsList.innerHTML = data.alerts.map((a, i) => `
       <div class="alert-card ${a.color || ''}" style="animation-delay:${i * 0.05}s">
         <div class="alert-title">${escHtml(a.title)}</div>
         <div class="alert-desc">${escHtml(a.desc)}</div>
+        ${a.members?.length ? `<div class="members" style="margin-top:8px"><span style="font-size:11px;color:#888">👥</span>${a.members.map(m => `<span class="member-tag">${escHtml(m)}</span>`).join('')}</div>` : ''}
         <div class="alert-date">📅 ${escHtml(a.date)}</div>
+        ${a.sourceUrl ? `<a href="${escHtml(a.sourceUrl)}" target="_blank" rel="noopener noreferrer" class="source-link">🔗 ${escHtml(a.sourceLabel || 'View Source')}</a>` : ''}
       </div>`).join('');
   } else {
     alertsList.innerHTML = `<div class="empty-state"><div class="icon">✅</div><h3>No alerts</h3></div>`;
@@ -415,7 +421,7 @@ function renderData(data) {
 }
 
 function renderFallback() {
-  document.getElementById('today-cards').innerHTML = `<div class="empty-state"><div class="icon">⚠️</div><h3>Could not load data</h3><p>Ensure you have added GEMINI_API_KEY in Vercel.</p></div>`;
+  document.getElementById('today-cards').innerHTML = `<div class="empty-state"><div class="icon">⚠️</div><h3>Could not load data</h3><p>Ensure your backend connection is active.</p></div>`;
 }
 
 function escHtml(str) {
