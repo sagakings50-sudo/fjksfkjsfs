@@ -271,13 +271,59 @@ async function fetchAndUpdate(manual = false) {
 
   try {
     const today = new Date().toLocaleDateString('en-PK', { timeZone: 'Asia/Karachi', day: 'numeric', month: 'long', year: 'numeric' });
-    const prompt = `You are an NGO tracker for Lahore, Pakistan. Today is ${today}. Search the web for the LATEST information about NGOs in Lahore, Pakistan and return ONLY a valid JSON object with this exact structure:
+    const prompt = `You are an elite NGO tracker strictly focused on social work in Lahore, Pakistan. Today is ${today}.
+
+Search the web, news sites, and social media pages for the FRESHEST, most up-to-date data on NGOs operating in Lahore.
+
+GATHER DATA BASED ON THESE STRICT RULES:
+1. GEOGRAPHY: Limit all data strictly to the city of Lahore, Pakistan. If a nationwide NGO is featured, only mention their Lahore-specific operations.
+2. EVENTS: Find recent or upcoming social work events in Lahore. Provide the event name, a concise description (MAXIMUM 2 LINES), and list any key members/figures participating.
+3. INCIDENTS & NEWS: If anything notable happened to an NGO in Lahore, or if they appeared in recent news, include it in the "alerts" section.
+4. FRESHNESS: Prioritize data from the last few days. 
+
+Return ONLY a valid JSON object with this exact structure:
 {
-  "todayEvents": [{"org": "Org Name", "orgColor": "green", "title": "Title", "desc": "Desc", "members": ["Member"], "badge": "Active", "badgeColor": "green", "date": "Date", "location": "Location"}],
-  "upcomingEvents": [{"title": "Title", "desc": "Desc", "date": "Date", "orgs": ["Org"], "color": "green"}],
-  "alerts": [{"title": "Title", "desc": "Desc", "date": "Date", "color": "red", "members": ["Member"]}],
-  "ramadan": {"show": false, "day": "", "message": ""},
-  "stats": {"todayCount": 0, "upcomingCount": 0, "alertsCount": 0}
+  "todayEvents": [
+    {
+      "org": "Organization name",
+      "orgColor": "green|gold|blue|red",
+      "title": "Event Name",
+      "desc": "Short description (strictly max 2 lines)",
+      "members": ["Member 1", "Member 2"],
+      "badge": "Active|News|Incident",
+      "badgeColor": "green|gold|blue|red",
+      "date": "Date string",
+      "location": "Lahore location"
+    }
+  ],
+  "upcomingEvents": [
+    {
+      "title": "Event Name",
+      "desc": "Short description (strictly max 2 lines)",
+      "date": "Date string",
+      "orgs": ["Org1"],
+      "color": "green|gold"
+    }
+  ],
+  "alerts": [
+    {
+      "title": "News/Incident Title",
+      "desc": "What happened to the NGO in Lahore (strictly max 2 lines)",
+      "date": "Date",
+      "color": "red|gold|blue",
+      "members": ["Key Figure"]
+    }
+  ],
+  "ramadan": {
+    "show": true or false,
+    "day": "Ramadan day if applicable",
+    "message": "Brief message about Lahore NGO Ramadan drives"
+  },
+  "stats": {
+    "todayCount": number,
+    "upcomingCount": number,
+    "alertsCount": number
+  }
 }`;
 
     const res = await fetch('/api/fetch-ngos', {
