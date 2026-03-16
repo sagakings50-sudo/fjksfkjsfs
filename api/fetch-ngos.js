@@ -8,7 +8,7 @@ module.exports = async function handler(req, res) {
     // 1. Force Gemini to drop the search citations that break JSON formatting
     const safePrompt = req.body.prompt + "\n\nCRITICAL INSTRUCTION: You MUST NOT include any search citations, footnotes, or reference numbers (like [1]) anywhere in your response. Return ONLY pure, raw JSON without any markdown formatting.";
 
-    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`, {
+   const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key=${apiKey}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
