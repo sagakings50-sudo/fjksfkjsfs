@@ -14,10 +14,9 @@ module.exports = async function handler(req, res) {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         contents: [{ parts: [{ text: req.body.prompt }] }],
-        tools: [{ googleSearch: {} }],
+        tools: [{ googleSearch: {} }], // Live search is kept
         generationConfig: {
-          responseMimeType: "application/json",
-          temperature: 0.2
+          temperature: 0.2 // JSON enforcer removed
         }
       })
     });
@@ -28,7 +27,11 @@ module.exports = async function handler(req, res) {
       throw new Error(data.error?.message || 'Gemini API Error');
     }
 
-    const textResponse = data.candidates[0].content.parts[0].text;
+    let textResponse = data.candidates[0].content.parts[0].text;
+    
+    // Clean up any markdown formatting (like ```json) the AI might add
+    textResponse = textResponse.replace(/```json|```/g, '').trim();
+    
     res.status(200).json(JSON.parse(textResponse));
 
   } catch (error) {
