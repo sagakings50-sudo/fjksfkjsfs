@@ -8,38 +8,26 @@ module.exports = async function handler(req, res) {
 
     const today = new Date().toLocaleDateString('en-PK', { timeZone: 'Asia/Karachi', day: 'numeric', month: 'long', year: 'numeric' });
 
-    // 2. Strict Lahore-only prompt with a BAN on academic spam
-    const safePrompt = `You are a strict NGO tracker for Lahore, Pakistan. Today is ${today}.
-    
-    CRITICAL BANS:
-    - NO Academic Conferences (e.g., "Academic World Research", "ICCDSW", "ICA2SR").
-    - NO University summits or research papers.
-    - NO data from outside Lahore city.
-
-    STRICT RULES:
-    - ONLY include verified NGOs/INGOs in Lahore (e.g., Edhi, Alkhidmat, Akhuwat, Rizq, SOS Village).
-    - Look for: Medical camps, ration drives, welfare news, and incident reports.
-    - Descriptions must be MAX 2 LINES.
-    - SOURCE LINKS: Provide the actual URL for every single item.
-    - NO CITATIONS: Do not include [1] or [2] in the JSON.
-
-    Return ONLY valid JSON:
+    // 2. Updated prompt with explicit "No Citations" rule to prevent JSON corruption
+    const safePrompt = `Strictly track real NGO/INGO events in Lahore, Pakistan. Today is ${today}. 
+    RULES: No academic conferences. No events outside Lahore. Max 2 line descriptions.
+    CRITICAL: Do NOT include any citations like [1] or [2] in your output.
+    Return ONLY raw valid JSON matching this schema:
     {
-      "todayEvents": [ { "org": "", "orgColor": "green", "title": "", "desc": "", "members": [""], "badge": "Active", "badgeColor": "green", "date": "${today}", "location": "Lahore", "sourceUrl": "", "sourceLabel": "" } ],
+      "todayEvents": [ { "org": "", "orgColor": "green", "title": "", "desc": "", "members": [""], "badge": "Active", "badgeColor": "green", "date": "", "location": "Lahore", "sourceUrl": "", "sourceLabel": "" } ],
       "upcomingEvents": [],
       "alerts": [],
       "ramadan": { "show": true, "day": "", "message": "" },
       "stats": { "todayCount": 0, "upcomingCount": 0, "alertsCount": 0 }
     }`;
 
-    // 3. Using the high-capacity Lite model
+    // 3. Using the 2.5-Flash-Lite model to solve the "not found" error
     const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key=${apiKey}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         contents: [{ parts: [{ text: safePrompt }] }],
-        tools: [{ googleSearch: {} }],
-        generationConfig: { temperature: 0.2 }
+        tools: [{ googleSearch: {} }]
       })
     });
 
@@ -50,12 +38,11 @@ module.exports = async function handler(req, res) {
     const jsonMatch = textResponse.match(/\{[\s\S]*\}/);
     if (!jsonMatch) throw new Error("Invalid AI formatting.");
 
-    // 4. THE MAGIC: Cache this successful response for 1 hour (3600 seconds)
+    // 4. THE CACHE: Tell Vercel to remember this data for 1 hour
     res.setHeader('Cache-Control', 's-maxage=3600, stale-while-revalidate');
     res.status(200).json(JSON.parse(jsonMatch[0]));
 
   } catch (error) {
-    console.error("Backend Error:", error);
     res.status(500).json({ error: error.message });
   }
 }
