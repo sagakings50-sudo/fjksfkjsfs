@@ -271,58 +271,61 @@ async function fetchAndUpdate(manual = false) {
 
   try {
     const today = new Date().toLocaleDateString('en-PK', { timeZone: 'Asia/Karachi', day: 'numeric', month: 'long', year: 'numeric' });
-    const prompt = `You are an elite NGO tracker strictly focused on social work in Lahore, Pakistan. Today is ${today}.
+   const prompt = `You are a real-time NGO intelligence tracker for Lahore, Pakistan. Today is ${today}.
 
-Search the web, news sites, and social media pages for the FRESHEST, most up-to-date data on NGOs operating in Lahore.
+Use web search to find the LATEST information. Search news sites, Dawn, Geo, The News, Tribune, and social media pages (Facebook, Instagram, Twitter/X) of NGOs operating in Lahore.
 
-GATHER DATA BASED ON THESE STRICT RULES:
-1. GEOGRAPHY: Limit all data strictly to the city of Lahore, Pakistan. If a nationwide NGO is featured, only mention their Lahore-specific operations.
-2. EVENTS: Find recent or upcoming social work events in Lahore. Provide the event name, a concise description (MAXIMUM 2 LINES), and list any key members/figures participating.
-3. INCIDENTS & NEWS: If anything notable happened to an NGO in Lahore, or if they appeared in recent news, include it in the "alerts" section.
-4. FRESHNESS: Prioritize data from the last few days. 
+STRICT RULES:
+- ONLY include NGOs physically operating in Lahore city. No other city. No exceptions.
+- Descriptions must be MAX 2 LINES. Cut anything longer.
+- Pull key member names from event announcements or social posts.
+- Prioritize data from the last 48-72 hours only.
+- For events: search phrases like "NGO Lahore event 2026", "social work Lahore today", "Lahore welfare drive March 2026"
+- For news/alerts: search "NGO Lahore news", "Lahore charity incident", "welfare organization Lahore"
+- For Ramadan specifically: search "Ramadan drive Lahore NGO 2026", "iftar distribution Lahore"
 
-Return ONLY a valid JSON object with this exact structure:
+Return ONLY valid JSON, no extra text:
 {
   "todayEvents": [
     {
-      "org": "Organization name",
-      "orgColor": "green|gold|blue|red",
-      "title": "Event Name",
-      "desc": "Short description (strictly max 2 lines)",
-      "members": ["Member 1", "Member 2"],
-      "badge": "Active|News|Incident",
-      "badgeColor": "green|gold|blue|red",
-      "date": "Date string",
-      "location": "Lahore location"
+      "org": "Full NGO name",
+      "orgColor": "green",
+      "title": "Event name",
+      "desc": "What is happening. Max 2 lines only.",
+      "members": ["Name 1", "Name 2"],
+      "badge": "Active",
+      "badgeColor": "green",
+      "date": "16 Mar 2026",
+      "location": "Area name, Lahore"
     }
   ],
   "upcomingEvents": [
     {
-      "title": "Event Name",
-      "desc": "Short description (strictly max 2 lines)",
-      "date": "Date string",
-      "orgs": ["Org1"],
-      "color": "green|gold"
+      "title": "Event name",
+      "desc": "What will happen. Max 2 lines only.",
+      "date": "Date",
+      "orgs": ["NGO name"],
+      "color": "gold"
     }
   ],
   "alerts": [
     {
-      "title": "News/Incident Title",
-      "desc": "What happened to the NGO in Lahore (strictly max 2 lines)",
+      "title": "News or incident headline",
+      "desc": "What happened. Lahore only. Max 2 lines.",
       "date": "Date",
-      "color": "red|gold|blue",
-      "members": ["Key Figure"]
+      "color": "red",
+      "members": ["Key person name"]
     }
   ],
   "ramadan": {
-    "show": true or false,
-    "day": "Ramadan day if applicable",
-    "message": "Brief message about Lahore NGO Ramadan drives"
+    "show": true,
+    "day": "22nd Ramadan",
+    "message": "Specific Lahore NGO Ramadan activity happening right now."
   },
   "stats": {
-    "todayCount": number,
-    "upcomingCount": number,
-    "alertsCount": number
+    "todayCount": 0,
+    "upcomingCount": 0,
+    "alertsCount": 0
   }
 }`;
 
