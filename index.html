@@ -240,28 +240,29 @@ async function fetchAndUpdate(manual = false) {
   const overlay = document.getElementById('loading-overlay');
   const btn = document.getElementById('refresh-btn');
   overlay.classList.add('active');
-  if (btn) { btn.disabled = true; btn.textContent = '↻ Updating...'; }
+  if (btn) { btn.disabled = true; btn.textContent = manual ? '↻ Refreshing...' : '↻ Updating...'; }
 
   try {
-    // This now fetches from your OWN serverless backend
+    // Simple GET request to your Vercel backend
     const res = await fetch('/api/fetch-ngos');
     const parsed = await res.json();
 
     if (res.ok && !parsed.error) {
       renderData(parsed);
     } else {
+      console.error('API Error:', parsed.error);
       renderFallback();
     }
     updateLiveBadge();
     nextRefreshAt = Date.now() + REFRESH_MS;
   } catch(err) {
+    console.error('Fetch error:', err);
     renderFallback();
   } finally {
     overlay.classList.remove('active');
     if (btn) { btn.disabled = false; btn.textContent = '↻ Refresh Now'; }
   }
 }
-
   const loadingMsgs = ['Scanning Lahore social pages...', 'Checking news outlets...', 'Filtering Lahore-only data...', 'Formatting your digest...'];
   let msgIdx = 0;
   const msgInterval = setInterval(() => {
