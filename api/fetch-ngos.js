@@ -1,5 +1,5 @@
 module.exports = async function handler(req, res) {
-  // We use GET so Vercel can cache the response for you
+  // 1. Using GET allows Vercel to cache the response for you
   if (req.method !== 'GET') return res.status(405).json({ error: 'Method not allowed' });
 
   try {
@@ -8,25 +8,38 @@ module.exports = async function handler(req, res) {
 
     const today = new Date().toLocaleDateString('en-PK', { timeZone: 'Asia/Karachi', day: 'numeric', month: 'long', year: 'numeric' });
 
-    // The strict Lahore-only prompt
-    const safePrompt = `Strictly track real NGO events in Lahore, Pakistan. Today is ${today}. 
-    RULES: No academic conferences. No events outside Lahore. Max 2 line descriptions.
-    Return ONLY raw valid JSON:
+    // 2. Strict Lahore-only prompt with a BAN on academic spam
+    const safePrompt = `You are a strict NGO tracker for Lahore, Pakistan. Today is ${today}.
+    
+    CRITICAL BANS:
+    - NO Academic Conferences (e.g., "Academic World Research", "ICCDSW", "ICA2SR").
+    - NO University summits or research papers.
+    - NO data from outside Lahore city.
+
+    STRICT RULES:
+    - ONLY include verified NGOs/INGOs in Lahore (e.g., Edhi, Alkhidmat, Akhuwat, Rizq, SOS Village).
+    - Look for: Medical camps, ration drives, welfare news, and incident reports.
+    - Descriptions must be MAX 2 LINES.
+    - SOURCE LINKS: Provide the actual URL for every single item.
+    - NO CITATIONS: Do not include [1] or [2] in the JSON.
+
+    Return ONLY valid JSON:
     {
-      "todayEvents": [ { "org": "", "orgColor": "", "title": "", "desc": "", "members": [""], "badge": "", "badgeColor": "", "date": "", "location": "", "sourceUrl": "", "sourceLabel": "" } ],
+      "todayEvents": [ { "org": "", "orgColor": "green", "title": "", "desc": "", "members": [""], "badge": "Active", "badgeColor": "green", "date": "${today}", "location": "Lahore", "sourceUrl": "", "sourceLabel": "" } ],
       "upcomingEvents": [],
       "alerts": [],
       "ramadan": { "show": true, "day": "", "message": "" },
       "stats": { "todayCount": 0, "upcomingCount": 0, "alertsCount": 0 }
     }`;
 
-    // Switching to the high-quota Lite model
+    // 3. Using the high-capacity Lite model
     const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key=${apiKey}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         contents: [{ parts: [{ text: safePrompt }] }],
-        tools: [{ googleSearch: {} }]
+        tools: [{ googleSearch: {} }],
+        generationConfig: { temperature: 0.2 }
       })
     });
 
@@ -37,12 +50,12 @@ module.exports = async function handler(req, res) {
     const jsonMatch = textResponse.match(/\{[\s\S]*\}/);
     if (!jsonMatch) throw new Error("Invalid AI formatting.");
 
-    // EDGE CACHING: Memorize this data for 1 hour (3600 seconds)
-    // This stops you from hitting the quota even if you refresh 100 times.
+    // 4. THE MAGIC: Cache this successful response for 1 hour (3600 seconds)
     res.setHeader('Cache-Control', 's-maxage=3600, stale-while-revalidate');
     res.status(200).json(JSON.parse(jsonMatch[0]));
 
   } catch (error) {
+    console.error("Backend Error:", error);
     res.status(500).json({ error: error.message });
   }
 }
