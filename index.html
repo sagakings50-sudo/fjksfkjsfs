@@ -241,6 +241,7 @@ function updateLiveBadge() {
   document.getElementById('last-updated-text').textContent = '🕐 Last updated: ' + str + ' PKT';
 }
 
+// PASTE THIS NEW VERSION:
 async function fetchAndUpdate(manual = false) {
   const overlay = document.getElementById('loading-overlay');
   const btn = document.getElementById('refresh-btn');
@@ -255,78 +256,27 @@ async function fetchAndUpdate(manual = false) {
   }, 2000);
 
   try {
-    const today = new Date().toLocaleDateString('en-PK', { timeZone: 'Asia/Karachi', day: 'numeric', month: 'long', year: 'numeric' });
-    
-    // UPDATED STRICT LAHORE PROMPT
-    const prompt = `You are a strict, real-time NGO intelligence tracker for Lahore, Pakistan. Today is ${today}.
+    const res = await fetch('/api/fetch-ngos');
+    const parsed = await res.json();
 
-Search the web and news sites for the LATEST information regarding actual on-the-ground NGOs in Lahore.
-
-CRITICAL BANS (DO NOT INCLUDE THESE):
-- NO Academic Conferences (e.g., "Academic World Research", "ICCDSW", "ICA2SR", "ICSESM").
-- NO University symposiums, research paper calls, or corporate summits.
-- NO events outside of Lahore.
-
-STRICT RULES:
-- ONLY include actual events, campaigns, and news from verified NGOs and INGOs physically operating in Lahore (e.g., Edhi, Alkhidmat, Akhuwat, Saylani, Rizq, SOS Village, Shaukat Khanum, HRCP, CARE Foundation, transparent hands, etc.).
-- Acceptable event types: Medical camps, ration distributions, volunteer drives, official NGO fundraisers, rescue operations, and human rights interventions.
-- Descriptions must be MAX 2 LINES.
-- Pull key member names from the posts.
-- For events: search specifically for NGO names combined with "Lahore event", "welfare drive", "ration distribution", "free medical camp Lahore".
-- UPCOMING SECTION: Must be actual NGO activities scheduled AFTER today in Lahore. 
-- SOURCE LINKS: For every single item, include the actual URL of the webpage or social media post.
-
-Return ONLY valid JSON, no extra text:
-{
-  "todayEvents": [
-    {
-      "org": "Full NGO name",
-      "orgColor": "green",
-      "title": "Event name",
-      "desc": "What is happening. Max 2 lines only.",
-      "members": ["Name 1", "Name 2"],
-      "badge": "Active",
-      "badgeColor": "green",
-      "date": "Date",
-      "location": "Area name, Lahore",
-      "sourceUrl": "https://actual-link-where-this-was-found.com",
-      "sourceLabel": "Facebook Post / Dawn News / Twitter / NGO Website"
+    if (res.ok && !parsed.error) {
+      renderData(parsed);
+    } else {
+      console.error('API Error:', parsed.error);
+      renderFallback();
     }
-  ],
-  "upcomingEvents": [
-    {
-      "title": "Event name",
-      "desc": "What will happen. Max 2 lines only.",
-      "date": "Future date only",
-      "orgs": ["NGO or INGO name - Lahore based only"],
-      "color": "gold",
-      "sourceUrl": "https://actual-link-where-this-was-found.com",
-      "sourceLabel": "Facebook Post / Official Website / Tribune"
-    }
-  ],
-  "alerts": [
-    {
-      "title": "News or incident headline",
-      "desc": "What happened. Lahore only. Max 2 lines.",
-      "date": "Date",
-      "color": "red",
-      "members": ["Key person name"],
-      "sourceUrl": "https://actual-link-where-this-was-found.com",
-      "sourceLabel": "Geo News / Instagram / Dawn"
-    }
-  ],
-  "ramadan": {
-    "show": true,
-    "day": "Day number",
-    "message": "Specific Lahore NGO Ramadan activity happening right now."
-  },
-  "stats": {
-    "todayCount": 0,
-    "upcomingCount": 0,
-    "alertsCount": 0
+    updateLiveBadge();
+    nextRefreshAt = Date.now() + REFRESH_MS;
+
+  } catch(err) {
+    console.error('Fetch error:', err);
+    renderFallback();
+  } finally {
+    clearInterval(msgInterval);
+    overlay.classList.remove('active');
+    if (btn) { btn.disabled = false; btn.textContent = '↻ Refresh Now'; }
   }
-}`;
-
+}
     // Pointing to your serverless backend
     const res = await fetch('/api/fetch-ngos', {
       method: 'POST',
