@@ -69,14 +69,9 @@
     .card-desc { font-size: 13px; color: var(--muted); line-height: 1.6; margin-bottom: 10px; flex: 1; }
     .badge { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; font-weight: 500; padding: 3px 9px; border-radius: 20px; }
     .badge-green { background: var(--green-light); color: var(--green); }
-    .badge-gold { background: var(--gold-light); color: var(--gold); }
-    .badge-blue { background: var(--blue-light); color: var(--blue); }
-    .badge-red { background: var(--red-light); color: var(--red); }
     .card-date { font-size: 11px; color: var(--muted); margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border); }
     .members { display: flex; align-items: center; flex-wrap: wrap; gap: 5px; margin-top: 8px; margin-bottom: 10px; }
     .member-tag { background: #f0ede8; border-radius: 6px; padding: 2px 8px; font-size: 11px; color: #444; }
-    
-    /* NEW LINK BUTTON STYLES */
     .source-link { display: inline-flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 600; color: var(--blue); background: var(--blue-light); padding: 6px 12px; border-radius: 6px; text-decoration: none; margin-top: 12px; transition: background 0.2s, transform 0.1s; align-self: flex-start; }
     .source-link:hover { background: #d1e0f5; transform: translateY(-1px); }
 
@@ -241,7 +236,6 @@ function updateLiveBadge() {
   document.getElementById('last-updated-text').textContent = '🕐 Last updated: ' + str + ' PKT';
 }
 
-// PASTE THIS NEW VERSION:
 async function fetchAndUpdate(manual = false) {
   const overlay = document.getElementById('loading-overlay');
   const btn = document.getElementById('refresh-btn');
@@ -256,34 +250,8 @@ async function fetchAndUpdate(manual = false) {
   }, 2000);
 
   try {
+    // THIS IS THE CRITICAL FIX: Simply fetches from your cached Vercel Backend
     const res = await fetch('/api/fetch-ngos');
-    const parsed = await res.json();
-
-    if (res.ok && !parsed.error) {
-      renderData(parsed);
-    } else {
-      console.error('API Error:', parsed.error);
-      renderFallback();
-    }
-    updateLiveBadge();
-    nextRefreshAt = Date.now() + REFRESH_MS;
-
-  } catch(err) {
-    console.error('Fetch error:', err);
-    renderFallback();
-  } finally {
-    clearInterval(msgInterval);
-    overlay.classList.remove('active');
-    if (btn) { btn.disabled = false; btn.textContent = '↻ Refresh Now'; }
-  }
-}
-    // Pointing to your serverless backend
-    const res = await fetch('/api/fetch-ngos', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ prompt: prompt })
-    });
-
     const parsed = await res.json();
 
     if (res.ok && !parsed.error) {
@@ -318,7 +286,6 @@ function renderData(data) {
     bannerWrap.innerHTML = `<div class="ramadan-banner"><div class="ramadan-icon">🌙</div><div class="ramadan-text"><h3>${data.ramadan.day ? data.ramadan.day + ' Ramadan' : 'Ramadan Mubarak'}</h3><p>${data.ramadan.message}</p></div></div>`;
   } else { bannerWrap.innerHTML = ''; }
 
-  // Render Today's Events with LINK BUTTON
   const todayCards = document.getElementById('today-cards');
   if (data.todayEvents?.length) {
     todayCards.innerHTML = data.todayEvents.map((e, i) => `
@@ -338,7 +305,6 @@ function renderData(data) {
     todayCards.innerHTML = `<div class="empty-state"><div class="icon">📭</div><h3>No events found</h3><p>No new NGO events reported in Lahore today.</p></div>`;
   }
 
-  // Render Upcoming Events with LINK BUTTON
   const timeline = document.getElementById('upcoming-timeline');
   if (data.upcomingEvents?.length) {
     timeline.innerHTML = data.upcomingEvents.map((e, i) => `
@@ -356,7 +322,6 @@ function renderData(data) {
     timeline.innerHTML = `<div class="empty-state"><div class="icon">📆</div><h3>No upcoming events</h3></div>`;
   }
 
-  // Render Alerts with LINK BUTTON
   const alertsList = document.getElementById('alerts-list');
   if (data.alerts?.length) {
     alertsList.innerHTML = data.alerts.map((a, i) => `
