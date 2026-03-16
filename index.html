@@ -258,21 +258,23 @@ async function fetchAndUpdate(manual = false) {
     const today = new Date().toLocaleDateString('en-PK', { timeZone: 'Asia/Karachi', day: 'numeric', month: 'long', year: 'numeric' });
     
     // UPDATED STRICT LAHORE PROMPT
-    const prompt = `You are a real-time NGO intelligence tracker for Lahore, Pakistan. Today is ${today}.
+    const prompt = `You are a strict, real-time NGO intelligence tracker for Lahore, Pakistan. Today is ${today}.
 
-Use web search to find the LATEST information. Search news sites, Dawn, Geo, The News, Tribune, and social media pages (Facebook, Instagram, Twitter/X) of NGOs operating in Lahore.
+Search the web and news sites for the LATEST information regarding actual on-the-ground NGOs in Lahore.
+
+CRITICAL BANS (DO NOT INCLUDE THESE):
+- NO Academic Conferences (e.g., "Academic World Research", "ICCDSW", "ICA2SR", "ICSESM").
+- NO University symposiums, research paper calls, or corporate summits.
+- NO events outside of Lahore.
 
 STRICT RULES:
-- ONLY include NGOs and INGOs physically operating in Lahore city. No other city. No exceptions.
-- Descriptions must be MAX 2 LINES. Cut anything longer.
-- Pull key member names from event announcements or social posts.
-- Prioritize data from the last 48-72 hours only.
-- For events: search "NGO Lahore event 2026", "social work Lahore today", "Lahore welfare drive March 2026"
-- For upcoming events: search "upcoming NGO event Lahore 2026", "INGO Lahore program scheduled", "Lahore welfare event announced"
-- For news/alerts: search "NGO Lahore news", "Lahore charity incident", "welfare organization Lahore"
-- For Ramadan: search "Ramadan drive Lahore NGO 2026", "iftar distribution Lahore"
-- UPCOMING SECTION: Only include events that are officially announced and scheduled AFTER today by NGOs or INGOs based in Lahore. No past events. No nationwide events unless Lahore is the specific venue.
-- SOURCE LINKS: For every single item (event, upcoming, alert), include the actual URL of the webpage, news article, or social media post where you found that specific information. If no direct link found, leave as empty string.
+- ONLY include actual events, campaigns, and news from verified NGOs and INGOs physically operating in Lahore (e.g., Edhi, Alkhidmat, Akhuwat, Saylani, Rizq, SOS Village, Shaukat Khanum, HRCP, CARE Foundation, transparent hands, etc.).
+- Acceptable event types: Medical camps, ration distributions, volunteer drives, official NGO fundraisers, rescue operations, and human rights interventions.
+- Descriptions must be MAX 2 LINES.
+- Pull key member names from the posts.
+- For events: search specifically for NGO names combined with "Lahore event", "welfare drive", "ration distribution", "free medical camp Lahore".
+- UPCOMING SECTION: Must be actual NGO activities scheduled AFTER today in Lahore. 
+- SOURCE LINKS: For every single item, include the actual URL of the webpage or social media post.
 
 Return ONLY valid JSON, no extra text:
 {
